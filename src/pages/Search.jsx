@@ -1,26 +1,30 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import MovieCard from "../components/MovieCard";
+import "./MoviesGrid.css";
 
 const searchURL = import.meta.env.VITE_SEARCH;
 const apiKey = import.meta.env.VITE_API_KEY;
 
-import "./MoviesGrid.css";
-
 const Search = () => {
   const [searchParams] = useSearchParams();
-
   const [movies, setMovies] = useState([]);
   const query = searchParams.get("q");
 
   const getSearchedMovies = async (url) => {
-    const res = await fetch(url);
-    const data = await res.json();
-    setMovies(data.results);
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      setMovies(data.results || []);
+    } catch (err) {
+      console.error("Erro ao buscar filmes:", err);
+      setMovies([]);
+    }
   };
 
   useEffect(() => {
-    const searchWithQueryURL = `${searchURL}?${apiKey}&query=${query}`;
+    if (!query) return;
+    const searchWithQueryURL = `${searchURL}?${apiKey}&query=${encodeURIComponent(query)}`;
     getSearchedMovies(searchWithQueryURL);
   }, [query]);
 
