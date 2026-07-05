@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import MovieCard from "../components/MovieCard";
-
 import "./MoviesGrid.css";
 
 const moviesURL = import.meta.env.VITE_API;
@@ -10,18 +9,20 @@ const Home = () => {
   const [topMovies, setTopMovies] = useState([]);
 
   const getTopRatedMovies = async (url) => {
-    const res = await fetch(url);
-    const data = await res.json();
-    setTopMovies(data.results);
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      setTopMovies(data.results || []);
+    } catch (err) {
+      console.error("Erro ao buscar filmes:", err);
+      setTopMovies([]);
+    }
   };
 
   useEffect(() => {
     const topRatedUrl = `${moviesURL}top_rated?${apiKey}`;
-    console.log(topRatedUrl);
     getTopRatedMovies(topRatedUrl);
   }, []);
-
-  console.log(topMovies);
 
   return (
     <div className="container">
